@@ -11,7 +11,7 @@ function LeftSidebar() {
 
     return (
         <div className="w-full mx-auto h-screen lg:w-1/3 md:p-4">
-            <div className="bg-sidebar h-[95vh] md:h-full p-2 flex flex-col gap-2 rounded-md">
+            <div className="bg-sidebar h-full p-2 flex flex-col gap-2 rounded-md">
                 <h1 className="text-2xl text-center font-semibold text-orange-500">RoyalChats</h1>
                 <div className="flex gap-2 p-2">
                     <Avatar className="cursor-pointer size-9">

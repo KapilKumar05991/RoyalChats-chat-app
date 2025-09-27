@@ -12,7 +12,7 @@ const GroupTopbar = () => {
     const isAdmin = member?.role == 'admin'
     const members = conversation.members.map((member) => (member.user_id as any).name)
     return (
-        <div className="bg-white/10 z-40 sticky top-0 max-w-full overflow-auto flex items-center p-2 md:rounded-t-md gap-4">
+        <div className="bg-white/10 z-40 w-full overflow-auto flex items-center p-2 md:rounded-t-md gap-4">
             <Avatar className="cursor-pointer size-9">
                 <AvatarImage src={'/user.png'} alt="user_avatar" className="rounded-full object-cover" />
                 <AvatarFallback>{conversation.name}</AvatarFallback>
