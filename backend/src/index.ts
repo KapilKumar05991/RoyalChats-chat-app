@@ -51,12 +51,18 @@ io.use(socketMiddleware)
 export function sendMessageViaSocket(id: string, message: any) {
     const socket_id = online.get(id)
     if (socket_id) {
-        io.to(socket_id).emit('chat_message', { message });
+        io.to(socket_id).emit('chat_message', { message, group: false });
     }
 }
 
+export function sendNewGroupInfo(id: string, group: any) {
+    const socket_id = online.get(id)
+    if (socket_id) {
+        io.to(socket_id).emit('new_group', { group });
+    }
+}
 export function sendMessageToGroup(id: string, message: any) {
-    io.to(id).emit('chat_message', { message })
+    io.to(id).emit('chat_message', { message , group: true})
 }
 
 io.on('connection', async (socket) => {

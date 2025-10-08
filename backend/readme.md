@@ -10,6 +10,7 @@
 - me                `get`
 
 ## api/users
+- /:id              `get` --> fetch a user
 - /?filter='abc'    `get` --> fetch users with filter
 - /update            `patch` {avatar, name, new_password}
 - /contacts          `get`
@@ -20,6 +21,7 @@
 - /                 `post` {name,members} --> create a group conversation
 - /:id              `delete` --> delete a group conversation
 - /:receId          `get`  --> get conversation between [receiver,user]
+- /group/:id        `get` --> fetch a group
 - /messages/send    `post` {conversationId,isGroup, receiverId, text, file}
 - /messages/:convId `get` --> get all messages of a conversation
 - /messages/:msgId  `delete` --> delete the message

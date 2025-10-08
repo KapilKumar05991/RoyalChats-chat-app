@@ -1,4 +1,4 @@
-import {  Image, LoaderPinwheel, SendHorizonal, SmilePlus, X } from "lucide-react"
+import {  Image, LoaderCircle, SendHorizonal, SmilePlus, X } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import EmojiPicker from 'emoji-picker-react';
@@ -83,8 +83,8 @@ function InputMessage() {
                 {pic && <div className="absolute z-40 bottom-14 right-0.5 md:left-1"><InputImage url={pic} /><Button onClick={handleClear} variant={"destructive"} className="cursor-pointer absolute top-2 left-2"><X size={20} /></Button></div>}
                 <div onClick={() => setPicker(false)} className="flex-1 text-lg flex gap-2">
                     <Input className="py-5" onChange={(e) => setInput(e.target.value)} name="input" value={input} placeholder="Write Message ..." />
-                    <Button className="py-5" disabled={loading} onClick={handleClick}>
-                        {loading ? <LoaderPinwheel className="animate-spin size-4" /> : <span className="flex justify-center items-center gap-2"><span className="hidden md:inline text-lg">Send</span> <SendHorizonal className="size-5" /></span>}
+                    <Button className="cursor-pointer px-3 py-5.5 rounded-full" disabled={loading} onClick={handleClick}>
+                        {loading ? <LoaderCircle className="animate-spin size-4" /> : <span className=""><SendHorizonal className="size-5" /></span>}
                     </Button>
                 </div>
             </div>

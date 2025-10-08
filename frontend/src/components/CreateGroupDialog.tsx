@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LoaderPinwheel, Users } from "lucide-react"
+import { LoaderCircle, Users } from "lucide-react"
 import { useState } from "react"
 import { Checkbox } from "./ui/checkbox"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
@@ -23,7 +23,7 @@ function CreateGroupDialog() {
     const [members, setMembers] = useState<string[]>([])
     const {contacts} = useUserStore(state => state)
     const {createGroup, loading } = useUserStore(state => state)
-
+    const [open,setOpen] = useState(false)
     const toggleMember = (id: string) => {
         setMembers((prev) =>
             prev.includes(id) ? prev.filter((m_id) => m_id !== id) : [...prev, id]
@@ -36,9 +36,10 @@ function CreateGroupDialog() {
         }
         await createGroup({name, members})
         setName(''); setMembers([])
+        setOpen(false)
     }
     return (
-        <Dialog onOpenChange={() => {setName(''); setMembers([])}}>
+        <Dialog open={open} onOpenChange={(open) => {setName(''); setMembers([]); setOpen(open)}}>
             <form>
                 <DialogTrigger asChild>
                     <Button className="py-5"><Users className="size-4" />Create</Button>
@@ -66,7 +67,7 @@ function CreateGroupDialog() {
                                     >
                                         <Checkbox checked={members.includes(c._id)} />
                                         <Avatar className="size-9">
-                                            <AvatarImage className="object-cover" src={c.avatar.path || c.name} />
+                                            <AvatarImage className="object-cover" src={c.avatar.path || '/user.png'} />
                                             <AvatarFallback>{c.name[0]}</AvatarFallback>
                                         </Avatar>
                                         <span>{c.name}</span>
@@ -80,7 +81,7 @@ function CreateGroupDialog() {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <Button disabled={loading} onClick={handleCreate} type="submit">{loading && <LoaderPinwheel className="animate-spin"/>}Create</Button>
+                        <Button disabled={loading} onClick={handleCreate} type="submit">{loading && <LoaderCircle className="animate-spin"/>}Create</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>

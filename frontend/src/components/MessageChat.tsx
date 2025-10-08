@@ -26,16 +26,18 @@ const MessageChat = ({ message }: MessageProp) => {
   }, [])
 
   return (
-    <div className={`${byme ? 'bg-primary self-end' : 'bg-input/40'} max-w-3/4 relative w-fit rounded-md px-3 pr-7 py-2`}>
+    <div className={`${byme ? 'bg-primary self-end' : 'bg-input/40'} max-w-3/4 relative w-fit rounded-md p-1`}>
       {message.attachment.path && <MessageImage public_id={message.attachment.public_id} url={message.attachment.path} />}
       {byme &&
         <MessageMenu id={message._id} />
       }
-      <p className="leading-7 break-all">{message.text}</p>
-      {isGroupChat &&
-        <span className="absolute text-gray-300 left-1 top-0 text-[10px]">{byme ? 'You': sender}</span>
-      }
-      <span className="absolute text-gray-300 right-1 bottom-0 text-[10px]">{time}</span>
+      <div className="pl-2 pr-12 py-0.5">
+        <p className="leading-7 break-all">{message.text}</p>
+        {isGroupChat &&
+          <span className="absolute max-w-1/3 overflow-ellipsis text-gray-300 left-1 top-0 text-[10px]">{byme ? 'You': sender}</span>
+        }
+        <span className="absolute text-gray-300 right-1 bottom-0.5 text-[10px]">{time}</span>
+      </div>
     </div>
   )
 }

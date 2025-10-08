@@ -13,6 +13,7 @@ interface SocketStore {
     subscribeMessageEvent: () => void
     subscribeOnlineEvent: () => void
     subscribeTypingEvent: () => void
+    subscribeNewGroupEvent: () => void
     emmitTyping: () => void
     emmitJoinGroup: (id: string) => void
 }
@@ -37,13 +38,14 @@ const useSocketStore = create<SocketStore>()((set, get) => ({
     },
     subscribeEvents() {
         get().subscribeMessageEvent()
+        get().subscribeNewGroupEvent()
         get().subscribeOnlineEvent()
         get().subscribeTypingEvent()
     },
     subscribeMessageEvent() {
         const socket = get().socket
-        socket?.on('chat_message', ({ message }) => {
-            useChatStore.getState().setMessage(message)
+        socket?.on('chat_message', ({ message,group }) => {
+            useChatStore.getState().setMessage(message,group)
         })
     },
     subscribeOnlineEvent() {
@@ -57,6 +59,12 @@ const useSocketStore = create<SocketStore>()((set, get) => ({
         const socket = get().socket
         socket?.on('typing', (receiver_id) => {
             useChatStore.getState().setReceiverTyping(receiver_id)
+        })
+    },
+    subscribeNewGroupEvent() {
+        const socket = get().socket
+        socket?.on('new_group',({group}) => {
+            useUserStore.getState().setGroup(group)
         })
     },
     emmitTyping() {

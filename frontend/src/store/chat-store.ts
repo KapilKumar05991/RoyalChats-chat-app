@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import axios from '../utils/axios-instance'
 import { toast } from 'sonner'
 import useUserStore from './user-store'
-import useSocketStore from './socket-store'
 import type { Conversation, User } from '@/utils/types'
 
 export interface Message {
@@ -37,7 +36,7 @@ interface ChatStore {
         [key: string]: Pick<ChatData, 'count' | 'last_message'>
     }
     setReceiverTyping: (id: string) => void
-    setMessage: (message: Message) => void
+    setMessage: (message: Message,group: boolean) => void
     fetchMissedMessage: () => void
     setReceiver: (receiever: User) => void
     setGroup: (conversation: Conversation) => void
@@ -79,9 +78,7 @@ const useChatStore = create<ChatStore>()((set, get) => ({
         try {
             const res = await axios.get('api/users/messages/missed')
             set({ missed: res.data.missed_messages })
-        } catch (error) {
-            console.log(error)
-        }
+        } catch (error) {}
     },
     setReceiverTyping(id) {
         let clock;
@@ -93,7 +90,7 @@ const useChatStore = create<ChatStore>()((set, get) => ({
             }, 800)
         }
     },
-    setMessage(message) {
+    async setMessage(message,group) {
         const conversation = get().conversation
         if (message.conversation_id === conversation._id) {
             set({ messages: [...get().messages, message] })
@@ -113,7 +110,28 @@ const useChatStore = create<ChatStore>()((set, get) => ({
                 set({ cache: { ...cache } })
             } else {
                 const missed = get().missed
-                missed[message.sender_id] = { count: 1, last_message: message }
+                if(group) {
+                    if(missed.hasOwnProperty(message.conversation_id)) {
+                        const cnt = missed[message.conversation_id].count
+                        missed[message.conversation_id] = { count: cnt+1, last_message: message }
+                    } else {
+                        missed[message.conversation_id] = { count: 1, last_message: message }
+                    }
+                } else {
+                    const idx = useUserStore.getState().contacts.findIndex((user) => (user._id === message.sender_id))
+                    if(idx == -1) {
+                        try {
+                            const res = await axios.get(`/api/users/${message.sender_id}`)
+                            useUserStore.getState().setContact(res.data.user)
+                        } catch (error) {}
+                    }
+                    if(missed.hasOwnProperty(message.sender_id)) {
+                        const cnt = missed[message.sender_id].count
+                        missed[message.sender_id] = { count: cnt+1, last_message: message }
+                    } else {
+                        missed[message.sender_id] = { count: 1, last_message: message }
+                    }
+                }
                 set({ missed: { ...missed } })
             }
         }
@@ -165,6 +183,7 @@ const useChatStore = create<ChatStore>()((set, get) => ({
         get().saveInCache()
         const cache = get().cache
         const data = cache[conversation._id]
+        get().removeMissed(conversation._id)
         if (data) {
             const initalReceiver = useChatStore.getInitialState().receiver
             set({ receiver: initalReceiver, conversation: data.conversation, messages: data.messages })
@@ -175,7 +194,6 @@ const useChatStore = create<ChatStore>()((set, get) => ({
             const messages = res.data.messages
             const initalReceiver = useChatStore.getInitialState().receiver
             set({ receiver: initalReceiver, conversation: conversation, messages: messages, loading: false })
-            useSocketStore.getState().emmitJoinGroup(conversation._id)
         }
     },
 
@@ -248,7 +266,6 @@ const useChatStore = create<ChatStore>()((set, get) => ({
     },
     removeMissed(id) {
         const missed = get().missed
-        delete missed[id]
         delete missed[id]
         set({ missed: { ...missed } })
     },

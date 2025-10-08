@@ -172,6 +172,36 @@ const getGroups = async (req: Request, res: Response) => {
   }
 }
 
+const getUser = async (req: Request, res: Response) => {
+  const id = req.params.id
+  if (!id) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: 'user id required'
+    })
+  }
+  try {
+    const user = await User.findById(id).select('-password')
+    if (!user) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'user not found'
+      })
+    }
+    res.json({
+      success: true,
+      message: 'user found in records',
+      user
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'internal server error',
+      error
+    })
+  }
+}
+
 const getUsers = async (req: Request, res: Response) => {
   try {
 
@@ -216,7 +246,7 @@ const getMissedMessages = async (req: Request, res: Response) => {
     is_group: false,
     "members.user_id": userId
   })
-  const missed: {[key: string]: {count: number, last_message: any}} = {}
+  const missed: { [key: string]: { count: number, last_message: any } } = {}
   for (const conversation of conversations) {
     const messages = await Message.find({
       conversation_id: conversation._id,
@@ -264,6 +294,7 @@ const updateLastSeen = async (id: string) => {
 export {
   update,
   getContacts,
+  getUser,
   getUsers,
   getGroups,
   getMissedMessages,

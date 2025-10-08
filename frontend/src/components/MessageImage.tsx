@@ -11,8 +11,8 @@ interface MessageImageProp {
 function MessageImage({ url, public_id }: MessageImageProp) {
     const downloadUrl = `https://res.cloudinary.com/${cloud_name}/image/upload/fl_attachment:${Date.now()}/${public_id}.jpg`;
     return (
-        <div className="relative cursor-pointer">
-            <a download className="absolute bottom-2 right-2" href={downloadUrl}>
+        <div className="relative pb-2 cursor-pointer">
+            <a download className="absolute bottom-4 right-2" href={downloadUrl}>
                 <Button variant={"outline"}>
                     <ArrowDownCircle className="size-6 text-gray-300" />
                 </Button>

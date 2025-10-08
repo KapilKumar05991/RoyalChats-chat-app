@@ -2,7 +2,7 @@ import type { Request, Response } from "express"
 import { Conversation } from "../models/conversation.js"
 import { StatusCodes } from "http-status-codes"
 import { Message } from "../models/message.js"
-import { sendMessageToGroup, sendMessageViaSocket } from "../index.js"
+import { sendMessageToGroup, sendMessageViaSocket, sendNewGroupInfo } from "../index.js"
 import cloudinary from "../config/cloudinary.js"
 import { groupSchema } from "../utils/types.js"
 
@@ -236,13 +236,20 @@ const createGroup = async (req: Request, res: Response) => {
             is_group: true,
             members: membersArr
         })
-
+        
         const group = await Conversation.findById(conversation._id).populate([{ path: 'members.user_id', select: '-password' }])
         res.status(StatusCodes.CREATED).json({
             success: true,
             message: 'Group created',
             group
         })
+
+        members.forEach((id: string) => {
+            if(id != userId) {
+                sendNewGroupInfo(id,group)
+            }
+        })
+
     } catch (error) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             success: false,

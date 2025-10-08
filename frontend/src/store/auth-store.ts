@@ -73,10 +73,8 @@ const useAuthStore = create<AuthStore>()((set, get) => ({
       const initialState = useAuthStore.getInitialState()
       set({...initialState})
       set({ loading: false })
-      console.log(get())
       toast(res.data.message)
     } catch (error: any) {
-      console.log(error)
       toast.error(error.response.data.message)
     }
   },

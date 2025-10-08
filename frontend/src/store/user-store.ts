@@ -3,6 +3,7 @@ import axios from "../utils/axios-instance";
 import type { Conversation, User } from "@/utils/types";
 import useAuthStore from "./auth-store";
 import { toast } from "sonner";
+import useSocketStore from "./socket-store";
 
 interface UserStore {
     loading: boolean
@@ -15,7 +16,8 @@ interface UserStore {
     fetchContacts: () => void
     fetchGroups: () => void
     setContact: (contact: User) => void
-    createGroup: (data: any) => void
+    setGroup: (group: Conversation) => void
+    createGroup: (data: any) => Promise<void>
     sortContacts: () => void
     setOnlineUsers: (ids: string[]) => void
     updateProfile: (data: FormData) => void
@@ -50,6 +52,9 @@ const useUserStore = create<UserStore>()((set, get) => ({
             const res = await axios.get('/api/users/groups')
             set({ groups: res.data.groups })
             set({ loading: false })
+            res.data.groups.forEach((group: any) => {
+                useSocketStore.getState().emmitJoinGroup(group._id)
+            });
         } catch (error: any) {
             set({ loading: false })
         }
@@ -60,12 +65,18 @@ const useUserStore = create<UserStore>()((set, get) => ({
         set({ contacts })
         get().sortContacts()
     },
-
+    setGroup(group) {
+        const groups = get().groups
+        groups.push(group)
+        set({ groups })
+        useSocketStore.getState().emmitJoinGroup(group._id)
+    },
     async createGroup(data) {
         try {
             const res = await axios.post('/api/conversations', data)
             const group = res.data.group
             set({ groups: [... get().groups,group] })
+            useSocketStore.getState().emmitJoinGroup(group._id)
             toast.success(res.data.message)
         } catch (error: any) {
             toast.error(error.response.data.message)
